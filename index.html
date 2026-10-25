@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dinâmica Parapsíquica">
+<title>Dinâmica Parapsíquica</title>
+<meta name="theme-color" content="#EEF2F0">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #EEF2F0;
+    --ink: #1D2B2A;
+    --muted: #5E6E6B;
+    --track: #CFD9D5;
+    --accent: #2F6F5E;
+    --accent-ink: #FFFFFF;
+    --field: #FFFFFF;
+    --done: #C98A12;
+    --ring: #6EC1EE;
+    --preset-bg: #F9C2C2;
+    --preset-ink: #7A1F1F;
+    --preset-border: #F2A3A3;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121A19; --ink: #E6EEEB; --muted: #93A5A0; --track: #26332F;
+      --accent: #6FC2A6; --accent-ink: #0E1715; --field: #1B2624; --done: #E8B64A;
+      --ring: #8FD3FF; --preset-bg: #5A2A2C; --preset-ink: #FFD6D6; --preset-border: #7A3A3D;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121A19; --ink: #E6EEEB; --muted: #93A5A0; --track: #26332F;
+    --accent: #6FC2A6; --accent-ink: #0E1715; --field: #1B2624; --done: #E8B64A;
+      --ring: #8FD3FF; --preset-bg: #5A2A2C; --preset-ink: #FFD6D6; --preset-border: #7A3A3D;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; min-height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    display: flex; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  main {
+    width: 100%; max-width: 26rem;
+    padding: 1.5rem 1.25rem 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+  }
+  .heading {
+    margin: 0; text-align: center;
+    font-size: clamp(1.5rem, 7vw, 1.9rem); font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.15; color: var(--ink);
+  }
+  .dial { position: relative; width: min(78vw, 20rem); aspect-ratio: 1; }
+  .dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .dial circle { fill: none; stroke-width: 10; }
+  .dial .track { stroke: var(--track); }
+  .dial .fill { stroke: var(--ring); stroke-linecap: round; transition: stroke 0.3s; }
+  body.done .dial .fill { stroke: var(--done); }
+  .readout {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .time {
+    font-size: clamp(3.2rem, 17vw, 4.6rem); font-weight: 800;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.03em; line-height: 1;
+  }
+  .status { margin-top: 0.5rem; font-size: 0.95rem; color: var(--muted); min-height: 1.3em; }
+  body.done .status { color: var(--done); font-weight: 600; }
+
+  .setter { display: flex; align-items: flex-end; gap: 0.75rem; }
+  .setter label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+  .setter input {
+    width: 5.5rem; padding: 0.6rem 0.5rem;
+    font: 600 1.6rem/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink); background: var(--field);
+    border: 2px solid var(--track); border-radius: 0.75rem;
+  }
+  .setter input:focus { outline: none; border-color: var(--accent); }
+  .setter input:disabled { opacity: 0.45; }
+  .setter .colon { font-size: 1.6rem; font-weight: 800; padding-bottom: 0.55rem; }
+
+  .presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+  .presets button {
+    padding: 0.5rem 0.9rem; border-radius: 999px;
+    border: 1.5px solid var(--preset-border); background: var(--preset-bg); color: var(--preset-ink);
+    font: 600 0.95rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; cursor: pointer;
+  }
+  .presets button:disabled { opacity: 0.4; }
+
+  .controls { display: flex; gap: 0.75rem; width: 100%; }
+  .controls button {
+    flex: 1; padding: 1rem; border-radius: 1rem; cursor: pointer;
+    font: 800 1.1rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  }
+  #main-btn { flex: 2; background: var(--accent); color: var(--accent-ink); border: none; }
+  #reset-btn { background: transparent; color: var(--ink); border: 2px solid var(--track); }
+
+  .sounds { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+  .sounds button {
+    padding: 0.5rem 0.95rem; border-radius: 999px;
+    border: 1.5px solid var(--track); background: transparent; color: var(--muted);
+    font: 600 0.95rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; cursor: pointer;
+  }
+  .sounds button.on { border-color: var(--accent); color: var(--accent); }
+  .test {
+    background: none; border: none; color: var(--muted);
+    font: 600 0.9rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0.5rem;
+  }
+  .note { font-size: 0.8rem; color: var(--muted); text-align: center; line-height: 1.5; max-width: 22rem; margin: 0; }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .dial .fill { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1 class="heading">Dinâmica Parapsíquica</h1>
+  <div class="dial" aria-live="polite">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="track" cx="60" cy="60" r="52"></circle>
+      <circle class="fill" id="ring" cx="60" cy="60" r="52"></circle>
+    </svg>
+    <div class="readout">
+      <div class="time" id="time">05:00</div>
+      <div class="status" id="status">Pronto</div>
+    </div>
+  </div>
+
+  <div class="setter">
+    <label>Minutos<input id="min" type="number" inputmode="numeric" min="0" max="999" value="5"></label>
+    <span class="colon">:</span>
+    <label>Segundos<input id="sec" type="number" inputmode="numeric" min="0" max="59" value="0"></label>
+  </div>
+
+  <div class="presets" id="presets">
+    <button data-s="30">30 s</button>
+    <button data-s="60">1 min</button>
+    <button data-s="120">2 min</button>
+    <button data-s="180">3 min</button>
+    <button data-s="240">4 min</button>
+    <button data-s="300">5 min</button>
+    <button data-s="360">6 min</button>
+    <button data-s="420">7 min</button>
+    <button data-s="480">8 min</button>
+    <button data-s="540">9 min</button>
+    <button data-s="600">10 min</button>
+  </div>
+
+  <div class="controls">
+    <button id="main-btn">Iniciar</button>
+    <button id="reset-btn">Zerar</button>
+  </div>
+
+  <div class="sounds" role="radiogroup" aria-label="Som do alerta">
+    <button data-sound="marimba" class="on">Marimba</button>
+    <button data-sound="tigela">Tigela</button>
+    <button data-sound="kalimba">Kalimba</button>
+    <button data-sound="aurora">Aurora</button>
+    <button data-sound="eco">Eco</button>
+  </div>
+  <button class="test" id="test-btn">Ouvir o som</button>
+  <p class="note">Deixe esta tela aberta enquanto o timer corre. Com a tela bloqueada ou o Safari em segundo plano, o iPhone pode não tocar o som.</p>
+</main>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const timeEl = $("time"), statusEl = $("status"), ring = $("ring");
+  const minIn = $("min"), secIn = $("sec"), mainBtn = $("main-btn");
+  const presetBtns = document.querySelectorAll("#presets button");
+  const C = 2 * Math.PI * 52;
+  ring.style.strokeDasharray = C;
+
+  let duration = 300000, remaining = 300000, endAt = 0;
+  let running = false, beeped = false, loopId = null, ctx = null, wakeLock = null;
+
+  try {
+    const saved = parseInt(localStorage.getItem("timer-duration"), 10);
+    if (saved > 0) { duration = remaining = saved; }
+  } catch (e) {}
+
+  function fmt(ms) {
+    const total = Math.ceil(ms / 1000);
+    const m = Math.floor(total / 60), s = total % 60;
+    return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+
+  function render() {
+    timeEl.textContent = fmt(remaining);
+    const frac = duration > 0 ? remaining / duration : 0;
+    ring.style.strokeDashoffset = C * (1 - frac);
+    document.title = running ? fmt(remaining) + " · Dinâmica Parapsíquica" : "Dinâmica Parapsíquica";
+    const locked = running || (remaining < duration && remaining > 0);
+    minIn.disabled = secIn.disabled = locked;
+    presetBtns.forEach((b) => (b.disabled = locked));
+  }
+
+  function syncInputs() {
+    const total = Math.round(duration / 1000);
+    minIn.value = Math.floor(total / 60);
+    secIn.value = total % 60;
+  }
+
+  function setDuration(sec) {
+    sec = Math.max(0, Math.min(sec, 999 * 60 + 59));
+    duration = remaining = sec * 1000;
+    beeped = false;
+    document.body.classList.remove("done");
+    statusEl.textContent = "Pronto";
+    try { localStorage.setItem("timer-duration", String(duration)); } catch (e) {}
+    syncInputs();
+    render();
+  }
+
+  function unlockAudio() {
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
+    } catch (e) {}
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ctx = new AC();
+    }
+    if (ctx.state === "suspended") ctx.resume();
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.connect(ctx.destination); src.start(0);
+  }
+
+  const SOUNDS = {
+    marimba:   { tone: "marimba",   gap: 0.42 },
+    tigela:    { tone: "bowl",      gap: 0.95 },
+    kalimba:   { tone: "kalimba",   gap: 0.45 },
+    aurora:    { tone: "pad",       gap: 1.05 },
+    eco:       { tone: "echo",      gap: 0.6 }
+  };
+  let sound = "marimba";
+  try {
+    const sv = localStorage.getItem("timer-sound");
+    if (sv && SOUNDS[sv]) sound = sv;
+  } catch (e) {}
+
+  function partial(out, t0, freq, vol, attack, dur, type, detune) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.value = freq;
+    if (detune) o.detune.value = detune;
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(vol, t0 + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(out);
+    o.start(t0); o.stop(t0 + dur + 0.03);
+  }
+
+  function voice(kind, t0, freq, vol) {
+    const out = ctx.createGain();
+    out.connect(ctx.destination);
+
+    if (kind === "marimba") {
+      [[1, 1], [3.9, 0.22], [10.2, 0.06]].forEach(([m, a]) =>
+        partial(out, t0, freq * m, vol * a, 0.006, 0.55 / (1 + (m - 1) * 0.5)));
+      return;
+    }
+
+    if (kind === "bowl") {
+      // Tigela tibetana: parciais inarmônicos com leve batimento, cauda longa
+      const f = freq * 0.5;
+      [[1, 1], [2.71, 0.32], [5.2, 0.12]].forEach(([m, a]) => {
+        const dur = 3.2 / (1 + (m - 1) * 0.4);
+        partial(out, t0, f * m, vol * a * 0.55, 0.04, dur, "sine", -4);
+        partial(out, t0, f * m, vol * a * 0.55, 0.04, dur, "sine", 4);
+      });
+      return;
+    }
+
+    if (kind === "kalimba") {
+      // Kalimba: ataque de dedo curto, fundamental redonda
+      partial(out, t0, freq, vol, 0.004, 0.95);
+      partial(out, t0, freq * 5.9, vol * 0.18, 0.002, 0.12);
+      partial(out, t0, freq * 2, vol * 0.08, 0.004, 0.35);
+      return;
+    }
+
+    if (kind === "pad") {
+      // Aurora: pad etéreo — osciladores levemente desafinados + quinta, filtro que abre devagar
+      const f = freq * 0.5;
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass"; lp.Q.value = 0.7;
+      lp.frequency.setValueAtTime(500, t0);
+      lp.frequency.linearRampToValueAtTime(1800, t0 + 0.6);
+      lp.frequency.exponentialRampToValueAtTime(700, t0 + 2.8);
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, t0);
+      env.gain.linearRampToValueAtTime(vol * 0.5, t0 + 0.35);
+      env.gain.setValueAtTime(vol * 0.5, t0 + 0.7);
+      env.gain.exponentialRampToValueAtTime(0.0001, t0 + 3.0);
+      lp.connect(env); env.connect(out);
+      [[f, -7], [f, 7], [f * 1.5, -5], [f * 1.5, 5], [f * 2, 0]].forEach(([fr, dt], i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "triangle"; o.frequency.value = fr; o.detune.value = dt;
+        g.gain.value = i === 4 ? 0.15 : 0.3;
+        o.connect(g); g.connect(lp);
+        o.start(t0); o.stop(t0 + 3.05);
+      });
+      return;
+    }
+
+    // Eco: piano elétrico macio (FM) com ecos que se dissolvem
+    const delay = ctx.createDelay(1.0);
+    delay.delayTime.value = 0.3;
+    const fb = ctx.createGain(); fb.gain.value = 0.38;
+    const dlp = ctx.createBiquadFilter();
+    dlp.type = "lowpass"; dlp.frequency.value = 1500;
+    const wet = ctx.createGain(); wet.gain.value = 0.5;
+    delay.connect(dlp); dlp.connect(fb); fb.connect(delay);
+    dlp.connect(wet); wet.connect(ctx.destination);
+
+    const f = freq * 0.5;
+    const car = ctx.createOscillator(), mod = ctx.createOscillator();
+    const modG = ctx.createGain(), env = ctx.createGain();
+    car.type = "sine"; mod.type = "sine";
+    car.frequency.value = f; mod.frequency.value = f;
+    modG.gain.setValueAtTime(f * 1.2, t0);
+    modG.gain.exponentialRampToValueAtTime(f * 0.05, t0 + 0.9);
+    mod.connect(modG); modG.connect(car.frequency);
+    env.gain.setValueAtTime(0, t0);
+    env.gain.linearRampToValueAtTime(vol * 0.8, t0 + 0.008);
+    env.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.8);
+    car.connect(env); env.connect(out); env.connect(delay);
+    car.start(t0); mod.start(t0);
+    car.stop(t0 + 1.85); mod.stop(t0 + 1.85);
+  }
+
+  function beep(which) {
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const cfg = SOUNDS[which || sound] || SOUNDS.marimba;
+    const base = ctx.currentTime + 0.03;
+    voice(cfg.tone, base, 880, 0.55);
+    voice(cfg.tone, base + cfg.gap, 1174, 0.55);
+  }
+
+  function startCue() {
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const cfg = SOUNDS[sound] || SOUNDS.marimba;
+    voice(cfg.tone, ctx.currentTime + 0.05, 659, 0.3);
+  }
+
+  async function keepAwake() {
+    try {
+      if ("wakeLock" in navigator && !wakeLock) {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => { wakeLock = null; });
+      }
+    } catch (e) {}
+  }
+  function releaseWake() {
+    try { if (wakeLock) wakeLock.release(); } catch (e) {}
+    wakeLock = null;
+  }
+
+  function tick() {
+    if (!running) return;
+    remaining = Math.max(0, endAt - Date.now());
+    if (remaining === 0) finish();
+    render();
+  }
+
+  function finish() {
+    running = false;
+    clearInterval(loopId);
+    remaining = 0;
+    if (!beeped) { beeped = true; beep(); }
+    document.body.classList.add("done");
+    statusEl.textContent = "Tempo esgotado";
+    mainBtn.textContent = "Iniciar";
+    releaseWake();
+  }
+
+  function start() {
+    unlockAudio();
+    const fresh = remaining <= 0 || remaining >= duration;
+    if (remaining <= 0) setDuration(Math.round(duration / 1000));
+    if (remaining <= 0) return;
+    running = true;
+    endAt = Date.now() + remaining;
+    document.body.classList.remove("done");
+    statusEl.textContent = "Correndo";
+    mainBtn.textContent = "Pausar";
+    if (fresh) startCue();
+    keepAwake();
+    clearInterval(loopId);
+    loopId = setInterval(tick, 200);
+    tick();
+  }
+
+  function pause() {
+    running = false;
+    clearInterval(loopId);
+    remaining = Math.max(0, endAt - Date.now());
+    statusEl.textContent = "Pausado";
+    mainBtn.textContent = "Continuar";
+    releaseWake();
+    render();
+  }
+
+  function reset() {
+    running = false;
+    clearInterval(loopId);
+    releaseWake();
+    mainBtn.textContent = "Iniciar";
+    setDuration(0);
+  }
+
+  function readInputs() {
+    const m = parseInt(minIn.value, 10) || 0;
+    let s = parseInt(secIn.value, 10) || 0;
+    s = Math.min(Math.max(s, 0), 59);
+    setDuration(Math.max(0, m) * 60 + s);
+  }
+
+  mainBtn.addEventListener("click", () => (running ? pause() : start()));
+  $("reset-btn").addEventListener("click", reset);
+  $("test-btn").addEventListener("click", () => { unlockAudio(); beep(); });
+  document.querySelectorAll(".sounds button").forEach((b) => {
+    if (b.dataset.sound === sound) b.classList.add("on"); else b.classList.remove("on");
+    b.addEventListener("click", () => {
+      sound = b.dataset.sound;
+      try { localStorage.setItem("timer-sound", sound); } catch (e) {}
+      document.querySelectorAll(".sounds button").forEach((x) => x.classList.toggle("on", x === b));
+      unlockAudio(); beep();
+    });
+  });
+  minIn.addEventListener("change", readInputs);
+  secIn.addEventListener("change", readInputs);
+  presetBtns.forEach((b) => b.addEventListener("click", () => setDuration(parseInt(b.dataset.s, 10))));
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && running) { keepAwake(); tick(); }
+  });
+
+  syncInputs();
+  render();
+})();
+</script>
+<script>
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>
