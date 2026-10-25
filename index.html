@@ -6,41 +6,30 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Dinâmica Parapsíquica">
 <title>Dinâmica Parapsíquica</title>
-<meta name="theme-color" content="#EEF2F0">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0C1110">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root {
-    --bg: #EEF2F0;
-    --ink: #1D2B2A;
-    --muted: #5E6E6B;
-    --track: #CFD9D5;
-    --accent: #2F6F5E;
-    --accent-ink: #FFFFFF;
-    --field: #FFFFFF;
-    --done: #C98A12;
-    --ring: #6EC1EE;
-    --preset-bg: #F9C2C2;
-    --preset-ink: #7A1F1F;
-    --preset-border: #F2A3A3;
+    color-scheme: dark;
+    --bg: #0C1110;
+    --ink: #AEBBB7;
+    --muted: #66746F;
+    --track: #1C2523;
+    --accent: #2F6B5B;
+    --accent-ink: #D2DCD9;
+    --field: #131A19;
+    --done: #A88440;
+    --ring: #4A8DB3;
+    --preset-bg: #2E1A1B;
+    --preset-ink: #D19A9A;
+    --preset-border: #46272A;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #121A19; --ink: #E6EEEB; --muted: #93A5A0; --track: #26332F;
-      --accent: #6FC2A6; --accent-ink: #0E1715; --field: #1B2624; --done: #E8B64A;
-      --ring: #8FD3FF; --preset-bg: #5A2A2C; --preset-ink: #FFD6D6; --preset-border: #7A3A3D;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #121A19; --ink: #E6EEEB; --muted: #93A5A0; --track: #26332F;
-    --accent: #6FC2A6; --accent-ink: #0E1715; --field: #1B2624; --done: #E8B64A;
-      --ring: #8FD3FF; --preset-bg: #5A2A2C; --preset-ink: #FFD6D6; --preset-border: #7A3A3D;
   }
   *, *::before, *::after { box-sizing: inherit; }
   html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
@@ -87,7 +76,7 @@
     color: var(--ink); background: var(--field);
     border: 2px solid var(--track); border-radius: 0.75rem;
   }
-  .setter input:focus { outline: none; border-color: var(--accent); }
+  .setter input:focus { outline: none; border-color: var(--ring); }
   .setter input:disabled { opacity: 0.45; }
   .setter .colon { font-size: 1.6rem; font-weight: 800; padding-bottom: 0.55rem; }
 
@@ -113,14 +102,14 @@
     border: 1.5px solid var(--track); background: transparent; color: var(--muted);
     font: 600 0.95rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif; cursor: pointer;
   }
-  .sounds button.on { border-color: var(--accent); color: var(--accent); }
+  .sounds button.on { border-color: var(--ring); color: var(--ring); }
   .test {
     background: none; border: none; color: var(--muted);
     font: 600 0.9rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
     text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0.5rem;
   }
   .note { font-size: 0.8rem; color: var(--muted); text-align: center; line-height: 1.5; max-width: 22rem; margin: 0; }
-  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  button:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) { .dial .fill { transition: none; } }
 </style>
 </head>
